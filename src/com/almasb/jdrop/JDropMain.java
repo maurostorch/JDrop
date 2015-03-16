@@ -101,6 +101,7 @@ public class JDropMain {
         System.out.println("get filename\t downloads filename file from Dropbox account to local machine");
         System.out.println("put filename\t uploads filename file from local machine to Dropbox account");
         System.out.println("mkdir foldername\t creates foldername directory");
+        System.out.println("exit\t exit program");
     }
 
     public static void main(String[] args) {
