@@ -52,14 +52,15 @@ public class JDropMain {
                 break;
 
             case "get":
-                if (params.length == 0)
-                    throw new IllegalArgumentException("Must pass filename as parameter");
+                if (params.length != 2)
+                    throw new IllegalArgumentException("Must pass filename and localfolder as parameter");
 
-                Files.createDirectories(Paths.get("./" + params[0]).getParent());
-
-                FileOutputStream outputStream = new FileOutputStream("./" + params[0]);
+                String localFolder = params[1].endsWith("/")?params[1]:params[1]+"/";
+		Files.createDirectories(Paths.get(localFolder).getParent());
+		String filename = params[0].substring(params[0].lastIndexOf("/")+1);
+                FileOutputStream outputStream = new FileOutputStream(localFolder + filename);
                 try {
-                    DbxEntry.File downloadedFile = client.getFile("/" + params[0], null, outputStream);
+                    DbxEntry.File downloadedFile = client.getFile(params[0], null, outputStream);
                     System.out.println("Downloaded: " + downloadedFile.name);
                 }
                 finally {
@@ -68,11 +69,11 @@ public class JDropMain {
                 break;
 
             case "put":
-                if (params.length == 0)
-                    throw new IllegalArgumentException("Must pass filename as parameter");
+                if (params.length != 2)
+                    throw new IllegalArgumentException("Must pass filename and destination as parameter");
 
                 File file = new File(params[0]);
-                DbxEntry.File uploadedFile = client.uploadFile("/" + file.getName(),
+                DbxEntry.File uploadedFile = client.uploadFile(params[1] + file.getName(),
                         DbxWriteMode.add(),
                         file.length(),
                         new FileInputStream(file));
@@ -98,8 +99,8 @@ public class JDropMain {
         System.out.println("help\t print this message");
         System.out.println("ls\t print files and folders in root directory");
         System.out.println("ls foldername\t print files and folders in foldername directory");
-        System.out.println("get filename\t downloads filename file from Dropbox account to local machine");
-        System.out.println("put filename\t uploads filename file from local machine to Dropbox account");
+        System.out.println("get filename localfolder\t downloads filename file from Dropbox account to local machine");
+        System.out.println("put filename remotefolder\t uploads filename file from local machine to Dropbox account");
         System.out.println("mkdir foldername\t creates foldername directory");
         System.out.println("exit\t exit program");
     }
