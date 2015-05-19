@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
+import com.dropbox.core.*;
+import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxEntry.Folder;
@@ -105,17 +107,29 @@ public class JDropMain {
         System.out.println("exit\t exit program");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         System.out.println("Connecting...");
 
         String token = getAccessToken();
+        DbxRequestConfig config = new DbxRequestConfig("JDrop/0.1", Locale.getDefault().toString());
+	Scanner input = new Scanner(System.in);
         if (token.isEmpty()) {
-            System.out.println("Cannot proceed without access token. Exiting");
-            return;
+            //System.out.println("Cannot proceed without access token. Exiting");
+            //return;
+	    DbxAppInfo appinfo = new DbxAppInfo("tsfw17duz6moze6","8ibzyo5ms367trh");
+	    DbxWebAuthNoRedirect r = new DbxWebAuthNoRedirect(config,appinfo);
+	    System.out.println(r.start());
+	    System.out.print("Type your code here:");
+	    DbxAuthFinish f = r.finish(input.nextLine());
+	    token = f.accessToken;
+	    FileOutputStream out = new FileOutputStream("access.token");
+	    out.write(token.getBytes("UTF-8"));
+	    out.close();
+
         }
 
-        DbxRequestConfig config = new DbxRequestConfig("JDrop/0.1", Locale.getDefault().toString());
         client = new DbxClient(config, token);
+	
 
         try {
             System.out.println("Connected to Dropbox account: " + client.getAccountInfo().displayName);
@@ -124,7 +138,6 @@ public class JDropMain {
             System.out.println("Error retrieving Dropbox account info: " + e.getMessage());
         }
 
-        Scanner input = new Scanner(System.in);
 
         String command = "help";
         while (!"exit".equals(command)) {
